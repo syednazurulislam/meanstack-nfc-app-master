@@ -6,6 +6,7 @@ const registerusers = require('../model/mongoSchema/userdetails');
 
 //importing multichain function's
 const multichain = require('./multichain');
+const {findasset}=require('./multichain');
 //importing epochtime function's
 const ecpochtoist = require('./EPOCHtoIST');
 
@@ -98,7 +99,7 @@ function findcitylike(input){
 
 registerusers.find({BranchName:{'$regex': input}},{BranchName:1,BlockChainValidAddress:1,BlockChainReturnAddress:1,_id:0},function(err,citynameandaddress){
 if(err){
-    console.log(err)
+    console.log(err);
     reject(err);
 }else{
     console.log("citynameandaddress: "+citynameandaddress);
@@ -108,7 +109,22 @@ if(err){
     })
 }
 
+function FindTheNonTamperAddress(){
+console.log("FindTheNonTamperAddress");
+return new Promise(function(resolve,reject){
 
+    registerusers.find({},{BlockChainValidAddress:1,_id:0},function(err,BlockChainValidAddresses){
+     if(err){
+         console.log(err);
+         reject(err);
+     }else{
+        console.log(BlockChainValidAddresses);
+        resolve(BlockChainValidAddresses);
+
+     }
+    });
+});
+}
 
 
 // //this function is for all product of particular address
@@ -139,5 +155,5 @@ module.exports.findcitylike = findcitylike;
 module.exports.getTracking = getTracking; */
 
  module.exports={
-findproduct,findcity,findcitylike,getTracking
+findproduct,findcity,findcitylike,getTracking,FindTheNonTamperAddress
  }

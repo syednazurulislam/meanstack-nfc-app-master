@@ -3,6 +3,7 @@ const assert = require('assert');
 var jwt = require('jsonwebtoken');
 var route = express.Router();
 var state = {};
+
 //passportService = require('../config/passport');
 passport = require('passport');
 var requireAuth = passport.authenticate('jwt', { session: false }),
@@ -334,7 +335,7 @@ route.post('/assetsonaddress', tokenpage.ensureToken, (req, res, next) => {
         }
     })
 })
-
+//to find the asset which pass through this address
 route.post('/knowtransaction',tokenpage.ensureToken,(req,res,next)=>{
     console.log("i am in know transactions");
     tokenpage.verify(req.token).then(verifyed=>{
@@ -355,5 +356,47 @@ route.post('/knowtransaction',tokenpage.ensureToken,(req,res,next)=>{
     
 })
 
+//to find total asset in the multichain
+route.post('/TotalBlockchainAsset', (req, res, next) => {
+    
+    multichain.TotalProduct().then(result=>{
+        console.log(result.length);
+        res.json(result.length);
+    })
+})
+
+//to find non-tamper product in blockchain
+route.post('/TotalNonTamperBlockchainAsset', (req, res, next) => {
+    MongoDB.FindTheNonTamperAddress().then(result=>{
+        console.log(result);
+        state.result=result;
+        var counter=0;
+        var nonTamperProduct=0;
+        
+       if(result){
+           while(state.result[counter]){
+            console.log("count="+counter);
+
+            multichain.myAssets(state.result[counter].BlockChainValidAddress).then(list => {
+                console.log("this is from the routes.js page " + JSON.stringify(list));
+                nonTamperProduct=nonTamperProduct+list.length;
+                // console.log(nonTamperProduct+"on address"+result[counter].BlockChainValidAddress);   
+                console.log(state.result.length);
+                
+               
+            })
+           
+             counter++;
+
+             if(counter == state.result.length-1) {
+                console.log("in if cond");
+                res.json(nonTamperProduct)
+            }
+           }
+            // res.json(nonTamperProduct)
+       }
+
+    })
+})
 
 module.exports = route;

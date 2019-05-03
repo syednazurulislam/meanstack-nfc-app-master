@@ -17,6 +17,7 @@ let multichain = require("multichain-node")(MultichainConfig);
 //getting the mutichain getinfo
 multichain.getInfo((err, info) => {
   if (err) {
+    console.log(err);
     throw err;
   }
   console.log(info);
@@ -122,9 +123,9 @@ function assetdetails(tagid) {
 
 //this function will do asset transfer 
 function assettransfer(data) {
-  console.log(data);
+  // console.log("this is from ************"+JSON.stringify(data));  
   return new Promise(function (resolve, reject) {
-    multichain.sendAssetFrom({ from: data.fromAddress, to: data.toAddress, asset: data.tagID, qty: 1 }).then(tx => {
+    multichain.sendAssetFrom({ from: data.fromAddress, to: data.toAddress, asset: data.tagID, qty: 1}).then(tx => {
       console.log(tx);
       resolve(tx);
     }).catch(err => {
@@ -140,10 +141,10 @@ function assettransfer(data) {
 
 
 //this function will list the product details
-function myAssets(BlockChainValidAddress) {
-  console.log("im in myassets " + BlockChainValidAddress);
+function myAssets(address) {
+  console.log("im in myassets " + address);
   return new Promise(function (resolve, reject) {
-    multichain.getAddressBalances({ address: BlockChainValidAddress }).then(assetlist => {
+    multichain.getAddressBalances({ address: address }).then(assetlist => {
       console.log("this from the multichain.js myassets " + assetlist);
       resolve(assetlist);
     })
@@ -169,6 +170,7 @@ function findasset(assetId, mongodata, tagstatus) {
     })
   })
 }
+
 // this function get all the transactions in th address 
 
 function knowaddresstransactions(Address){
@@ -237,17 +239,31 @@ function productListAddressTransactions(inputaddress) {
   })
 }
 
+
+//to find the total number of product in multichain
+function TotalProduct(){
+  return new Promise(function (resolve, reject) {
+    multichain.listAssets().then(result=>{
+      console.log("im in multichain total products"+result);
+      resolve(result);
+    })
+  })
+}
+
+
+
+
 // module.exports.knowaddresstransactions=knowaddresstransactions;
 // module.exports.getThreeAddress = getThreeAddress;
 // module.exports.myAssets = myAssets;
 // module.exports.CreateAsset = CreateAsset;
-// module.exports.findasset = findasset;
+module.exports.findasset = findasset;
 // module.exports.getAssetTransactions = getAssetTransactions;
 // module.exports.assetdetails = assetdetails;
 // module.exports.assettransfer = assettransfer;
 // module.exports.productListAddressTransactions = productListAddressTransactions;
 
 module.exports={
-  knowaddresstransactions,getThreeAddress,myAssets,CreateAsset,findasset,getAssetTransactions,assetdetails,
-  assettransfer,productListAddressTransactions
+  knowaddresstransactions,getThreeAddress,myAssets,CreateAsset,getAssetTransactions,assetdetails,
+  assettransfer,productListAddressTransactions,TotalProduct,findasset
 }
